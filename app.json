@@ -1,0 +1,23 @@
+{
+  "name": "CE Web-to-Salesforce Middleware",
+  "description": "Catholic Energies public forms to Salesforce: lookups, Solar Assessment, Desk Audit, Instant Audit, Procurement (stub)",
+  "repository": "https://github.com/CEI2026/ce-web-to-sf-middleware",
+  "keywords": ["salesforce", "catholic-energies"],
+  "env": {
+    "SF_CLIENT_ID": { "description": "Salesforce External Client App Consumer Key", "required": true },
+    "SF_CLIENT_SECRET": { "description": "Salesforce External Client App Consumer Secret", "required": true },
+    "SF_LOGIN_URL": { "description": "https://login.salesforce.com for production", "value": "https://login.salesforce.com", "required": true },
+    "NEW_ACCOUNTS_ENABLED": { "description": "true lets POST /accounts register new organizations (as In Review)", "required": false },
+    "DEMO_MODE": { "description": "true simulates registration and demo-account submissions with no Salesforce writes", "required": false },
+    "EI_UNKNOWN_ID": { "description": "Salesforce Id of the placeholder 'Not Applicable' Ecclesiastical Institution", "required": false },
+    "SCREENING_UPLOAD_SECRET": { "description": "Signs Desk Audit upload tokens (falls back to SF_CLIENT_SECRET)", "required": false },
+    "FREDDIE_JOB_SECRET": { "description": "Shared secret Freddie uses to sign its requests. Required for live Instant Audit.", "required": false },
+    "INSTANT_AUDIT_MOCK": { "description": "true answers Instant Audit from canned examples (no Freddie, no scoring) for form development", "required": false },
+    "INSTANT_AUDIT_SF_WRITE": { "description": "true writes Instant Audit data to Salesforce. Leave off until CR-S3 is live.", "required": false },
+    "INSTANT_AUDIT_ALLOWED_ORIGINS": { "description": "Comma-separated website origins allowed to call Instant Audit. Empty allows any.", "required": false },
+    "PUBLIC_BASE_URL": { "description": "This app's public address, used in report links, e.g. https://ce-web-to-sf-middleware.herokuapp.com", "required": false },
+    "REPORT_LINK_SECRET": { "description": "Signs report download links (falls back to FREDDIE_JOB_SECRET)", "required": false }
+  },
+  "formation": { "web": { "quantity": 1, "size": "basic" } },
+  "buildpacks": [{ "url": "heroku/nodejs" }]
+}

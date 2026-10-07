@@ -1,0 +1,17 @@
+{
+ "ok": false,
+ "errors": [
+  {
+   "field": "facts.sqft_total",
+   "message": "Enter the total square feet as a number"
+  },
+  {
+   "field": "accounts[0].rows[3].usage",
+   "message": "Enter the kWh for this month, or leave the month blank"
+  },
+  {
+   "field": "contact.email",
+   "message": "Enter an email address we can reach you at"
+  }
+ ]
+}

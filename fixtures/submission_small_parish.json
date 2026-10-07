@@ -1,0 +1,67 @@
+{
+ "submission_id": "33333333-3333-4333-8333-333333333333",
+ "mode": "monthly",
+ "building": {
+  "account_id": "001000000000TEST",
+  "building_id": "a1O000000000TEST",
+  "name": "St. Example Parish",
+  "address": "123 Main St, South Bend, IN 46601",
+  "zip": "46601"
+ },
+ "facts": {
+  "sqft_total": 6200,
+  "sqft_county": null,
+  "sqft_confirmed_county": false,
+  "building_type": "worship",
+  "heating_fuel": "gas",
+  "reasons": [],
+  "shared_meter_note": ""
+ },
+ "contact": {
+  "name": "Test Contact",
+  "email": "test.contact@example.org",
+  "phone": ""
+ },
+ "accounts": [
+  {
+   "label": "Electric 1",
+   "fuel": "electric",
+   "unit": "kwh",
+   "rows": [
+    {"month": "2025-06", "usage": 1500, "cost": 260.0},
+    {"month": "2025-07", "usage": 1450, "cost": 252.0},
+    {"month": "2025-08", "usage": 1200, "cost": 215.0},
+    {"month": "2025-09", "usage": 1100, "cost": 198.0},
+    {"month": "2025-10", "usage": 1000, "cost": 185.0},
+    {"month": "2025-11", "usage": 1050, "cost": 190.0},
+    {"month": "2025-12", "usage": 1150, "cost": 205.0},
+    {"month": "2026-01", "usage": 1300, "cost": 230.0},
+    {"month": "2026-02", "usage": 1050, "cost": 192.0},
+    {"month": "2026-03", "usage": 950, "cost": 178.0},
+    {"month": "2026-04", "usage": 1000, "cost": 185.0},
+    {"month": "2026-05", "usage": 1250, "cost": 222.0}
+   ]
+  },
+  {
+   "label": "Gas 1",
+   "fuel": "gas",
+   "unit": "therms",
+   "rows": [
+    {"month": "2025-06", "usage": 40, "cost": 60.0},
+    {"month": "2025-07", "usage": 50, "cost": 72.0},
+    {"month": "2025-08", "usage": 60, "cost": 85.0},
+    {"month": "2025-09", "usage": 40, "cost": 60.0},
+    {"month": "2025-10", "usage": 30, "cost": 48.0},
+    {"month": "2025-11", "usage": 20, "cost": 35.0},
+    {"month": "2025-12", "usage": 15, "cost": 30.0},
+    {"month": "2026-01", "usage": 15, "cost": 30.0},
+    {"month": "2026-02", "usage": 20, "cost": 35.0},
+    {"month": "2026-03", "usage": 30, "cost": 48.0},
+    {"month": "2026-04", "usage": 40, "cost": 60.0},
+    {"month": "2026-05", "usage": 45, "cost": 66.0}
+   ]
+  }
+ ],
+ "consent": true,
+ "website": ""
+}

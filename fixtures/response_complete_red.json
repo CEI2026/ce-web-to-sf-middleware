@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "status": "complete",
+ "submission_id": "33333333-3333-4333-8333-333333333333",
+ "result": {
+  "light": "red",
+  "headline": "Not a priority right now",
+  "annual_spend": 3141,
+  "basis": "client_entered",
+  "basis_label": "From figures you entered; not checked against bills",
+  "summary": {
+   "used": [
+    {
+     "lead": "Your figures",
+     "text": "A full year of figures you entered (June 2025 to May 2026) shows $3,141 a year in energy costs. We haven't checked them against your bills."
+    },
+    {
+     "lead": "Comparison",
+     "text": "Energy use is 14.2 kBtu per square foot a year. A typical place of worship uses 30.5, so this building uses 0.47 times as much (no more than typical)."
+    },
+    {
+     "lead": "Electricity price",
+     "text": "Electricity costs $0.179 per kWh, well above the Indiana average of $0.1244 for businesses."
+    }
+   ],
+   "means": "At this level of spending, an energy project is unlikely to pay for itself. That doesn't mean nothing can be saved; it means other sites are a better use of time right now.",
+   "next": "No action needed. If your costs change or you have a project in mind, run the audit again.",
+   "note": "kBtu (a thousand British thermal units) is a standard unit that lets electricity and gas be added together."
+  },
+  "honesty_line": "This is a quick first look to help decide where to spend time. It is not an energy assessment, and it does not estimate savings.",
+  "assumptions_version": "ceos-2026-10-r5",
+  "generated_utc": "2026-10-06T22:00:00Z"
+ },
+ "report": {
+  "state": "unavailable",
+  "url": null,
+  "filename": null
+ }
+}

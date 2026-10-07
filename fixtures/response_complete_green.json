@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "status": "complete",
+ "submission_id": "11111111-1111-4111-8111-111111111111",
+ "result": {
+  "light": "green",
+  "headline": "Worth a closer look",
+  "annual_spend": 38359,
+  "basis": "client_entered",
+  "basis_label": "From figures you entered; not checked against bills",
+  "summary": {
+   "used": [
+    {
+     "lead": "Your figures",
+     "text": "A full year of figures you entered (June 2025 to May 2026) shows $38,359 a year in energy costs. We haven't checked them against your bills."
+    },
+    {
+     "lead": "Comparison",
+     "text": "Energy use is 68.0 kBtu per square foot a year. A typical office building uses 52.9, so this building uses 1.29 times as much (above typical)."
+    },
+    {
+     "lead": "Electricity price",
+     "text": "Electricity costs $0.188 per kWh, well above the Tennessee average of $0.1205 for businesses."
+    }
+   ],
+   "means": "Your building spends a significant amount on energy and uses more than similar buildings. A short conversation with Catholic Energies could show where the energy goes.",
+   "next": "We'll be in touch to talk it through. This is a first look, not an energy assessment.",
+   "note": "kBtu (a thousand British thermal units) is a standard unit that lets electricity and gas be added together."
+  },
+  "honesty_line": "This is a quick first look to help decide where to spend time. It is not an energy assessment, and it does not estimate savings.",
+  "assumptions_version": "ceos-2026-10-r5",
+  "generated_utc": "2026-10-06T22:00:00Z"
+ },
+ "report": {
+  "state": "ready",
+  "url": "https://example.invalid/instant-audit/11111111-1111-4111-8111-111111111111/report?t=SIGNED_TOKEN",
+  "filename": "Instant_Audit_Report.pdf"
+ }
+}

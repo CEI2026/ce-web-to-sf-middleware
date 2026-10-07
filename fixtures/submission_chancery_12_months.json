@@ -1,0 +1,67 @@
+{
+ "submission_id": "11111111-1111-4111-8111-111111111111",
+ "mode": "monthly",
+ "building": {
+  "account_id": "001000000000TEST",
+  "building_id": "a1O000000000TEST",
+  "name": "Chancery",
+  "address": "805 Northshore Dr, Knoxville, TN 37902",
+  "zip": "37902"
+ },
+ "facts": {
+  "sqft_total": 15848,
+  "sqft_county": null,
+  "sqft_confirmed_county": false,
+  "building_type": "office-chancery",
+  "heating_fuel": "gas",
+  "reasons": [],
+  "shared_meter_note": ""
+ },
+ "contact": {
+  "name": "Test Contact",
+  "email": "test.contact@example.org",
+  "phone": ""
+ },
+ "accounts": [
+  {
+   "label": "Electric 1",
+   "fuel": "electric",
+   "unit": "kwh",
+   "rows": [
+    {"month": "2025-06", "usage": 18660, "cost": 3420.5},
+    {"month": "2025-07", "usage": 17640, "cost": 3290.1},
+    {"month": "2025-08", "usage": 14400, "cost": 2711.3},
+    {"month": "2025-09", "usage": 13080, "cost": 2480.9},
+    {"month": "2025-10", "usage": 12300, "cost": 2330.0},
+    {"month": "2025-11", "usage": 12900, "cost": 2441.7},
+    {"month": "2025-12", "usage": 13500, "cost": 2560.4},
+    {"month": "2026-01", "usage": 17160, "cost": 3166.2},
+    {"month": "2026-02", "usage": 12480, "cost": 2362.8},
+    {"month": "2026-03", "usage": 11400, "cost": 2165.0},
+    {"month": "2026-04", "usage": 12060, "cost": 2290.3},
+    {"month": "2026-05", "usage": 14820, "cost": 2740.2}
+   ]
+  },
+  {
+   "label": "Gas 1",
+   "fuel": "gas",
+   "unit": "therms",
+   "rows": [
+    {"month": "2025-06", "usage": 95, "cost": 140.2},
+    {"month": "2025-07", "usage": 110, "cost": 160.5},
+    {"month": "2025-08", "usage": 260, "cost": 330.1},
+    {"month": "2025-09", "usage": 480, "cost": 610.4},
+    {"month": "2025-10", "usage": 720, "cost": 905.2},
+    {"month": "2025-11", "usage": 900, "cost": 1120.8},
+    {"month": "2025-12", "usage": 950, "cost": 1180.0},
+    {"month": "2026-01", "usage": 700, "cost": 880.5},
+    {"month": "2026-02", "usage": 420, "cost": 540.9},
+    {"month": "2026-03", "usage": 180, "cost": 260.4},
+    {"month": "2026-04", "usage": 90, "cost": 150.0},
+    {"month": "2026-05", "usage": 60, "cost": 120.3}
+   ]
+  }
+ ],
+ "consent": true,
+ "website": ""
+}

@@ -1,0 +1,59 @@
+{
+ "submission_id": "22222222-2222-4222-8222-222222222222",
+ "mode": "monthly",
+ "building": {
+  "account_id": "001000000000TEST",
+  "building_id": "a1O000000000TEST",
+  "name": "Chancery (8 months)",
+  "address": "805 Northshore Dr, Knoxville, TN 37902",
+  "zip": "37902"
+ },
+ "facts": {
+  "sqft_total": 15848,
+  "sqft_county": null,
+  "sqft_confirmed_county": false,
+  "building_type": "office-chancery",
+  "heating_fuel": "gas",
+  "reasons": [],
+  "shared_meter_note": ""
+ },
+ "contact": {
+  "name": "Test Contact",
+  "email": "test.contact@example.org",
+  "phone": ""
+ },
+ "accounts": [
+  {
+   "label": "Electric 1",
+   "fuel": "electric",
+   "unit": "kwh",
+   "rows": [
+    {"month": "2025-06", "usage": 18660, "cost": 3420.5},
+    {"month": "2025-07", "usage": 17640, "cost": 3290.1},
+    {"month": "2025-08", "usage": 14400, "cost": 2711.3},
+    {"month": "2025-09", "usage": 13080, "cost": 2480.9},
+    {"month": "2025-10", "usage": 12300, "cost": 2330.0},
+    {"month": "2025-11", "usage": 12900, "cost": 2441.7},
+    {"month": "2025-12", "usage": 13500, "cost": 2560.4},
+    {"month": "2026-01", "usage": 17160, "cost": 3166.2}
+   ]
+  },
+  {
+   "label": "Gas 1",
+   "fuel": "gas",
+   "unit": "therms",
+   "rows": [
+    {"month": "2025-06", "usage": 95, "cost": 140.2},
+    {"month": "2025-07", "usage": 110, "cost": 160.5},
+    {"month": "2025-08", "usage": 260, "cost": 330.1},
+    {"month": "2025-09", "usage": 480, "cost": 610.4},
+    {"month": "2025-10", "usage": 720, "cost": 905.2},
+    {"month": "2025-11", "usage": 900, "cost": 1120.8},
+    {"month": "2025-12", "usage": 950, "cost": 1180.0},
+    {"month": "2026-01", "usage": 700, "cost": 880.5}
+   ]
+  }
+ ],
+ "consent": true,
+ "website": ""
+}
