@@ -15,6 +15,10 @@
     "INSTANT_AUDIT_MOCK": { "description": "true answers Instant Audit from canned examples (no Freddie, no scoring) for form development", "required": false },
     "INSTANT_AUDIT_SF_WRITE": { "description": "true writes Instant Audit data to Salesforce. Leave off until CR-S3 is live.", "required": false },
     "INSTANT_AUDIT_ALLOWED_ORIGINS": { "description": "Comma-separated website origins allowed to call Instant Audit. Empty allows any.", "required": false },
+    "LOOKUP_RATE_PER_HOUR": { "description": "Per-connection limit on each lookup (accounts, buildings, institutions). Default 120. 0 turns it off.", "required": false },
+    "SUBMIT_RATE_PER_HOUR": { "description": "Per-connection limit on each of /submit, /screening-request, /screening-complete. Default 20. 0 turns it off.", "required": false },
+    "FILE_RATE_PER_HOUR": { "description": "Per-connection limit on /screening-file (one request per bill). Default 300. 0 turns it off.", "required": false },
+    "REGISTER_RATE_PER_HOUR": { "description": "Per-connection limit on registering a new institution. Default 5. 0 turns it off.", "required": false },
     "PUBLIC_BASE_URL": { "description": "This app's public address, used in report links, e.g. https://ce-web-to-sf-middleware.herokuapp.com", "required": false },
     "REPORT_LINK_SECRET": { "description": "Signs report download links (falls back to FREDDIE_JOB_SECRET)", "required": false }
   },

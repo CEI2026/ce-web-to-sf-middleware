@@ -81,6 +81,7 @@ Copy the first group from the Heroku app of `ce-solar-middleware` (same Salesfor
 | `INSTANT_AUDIT_MOCK` | no | `true` for form development |
 | `INSTANT_AUDIT_SF_WRITE` | no | Leave **off** until change request CR-S3 is live and the API names are confirmed |
 | `INSTANT_AUDIT_ALLOWED_ORIGINS` | recommended | Comma-separated website origins (the Netlify sites) allowed to call Instant Audit |
+| `LOOKUP_RATE_PER_HOUR`, `SUBMIT_RATE_PER_HOUR`, `FILE_RATE_PER_HOUR`, `REGISTER_RATE_PER_HOUR` | no | Per-connection limits on the ported public endpoints (8.1.0). Defaults 120 (each lookup), 20 (each of /submit, /screening-request, /screening-complete), 300 (/screening-file, one request per bill), 5 (registering an institution). `0` turns a limit off. A refusal is HTTP 429 |
 | `PUBLIC_BASE_URL` | recommended | This app's address, for report links |
 | `REPORT_LINK_SECRET` | no | Signs report links; defaults to `FREDDIE_JOB_SECRET` |
 | `INSTANT_AUDIT_WAIT_MS`, `..._RATE_PER_HOUR`, `..._RATE_PER_BUILDING_DAY`, `..._CLAIM_TIMEOUT_MS`, `..._REPORT_GRACE_MS` | no | Tuning; defaults 12000, 10, 5, 120000, 120000 |
@@ -102,7 +103,7 @@ Salesforce admin confirms different names, change them there only.
    "GitHub Repo" field says `CEI2026/ce-web-to-sf-middleware` before editing any variable.**
 3. Start with `INSTANT_AUDIT_MOCK=true`. **Deploy manually** (Deploy tab, Manual deploy, `main`);
    do not rely on auto-deploy.
-4. Check: `curl https://<app>.herokuapp.com/` shows `"version":"8.0.1"` and `"mode":"mock"`.
+4. Check: `curl https://<app>.herokuapp.com/` shows `"version":"8.1.0"` and `"mode":"mock"`.
 
 ## Cutover, one form at a time (the old app stays up the whole time)
 

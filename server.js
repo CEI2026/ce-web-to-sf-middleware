@@ -20,8 +20,9 @@ const { JobQueue, SubmissionStore } = require('./lib/instant/queue');
 const { recoverPending } = require('./lib/instant/recover');
 const { createInstantRouter } = require('./routes/instant-audit');
 const { createProcurementRouter } = require('./routes/procurement');
+const { getLimits, createRouteLimits } = require('./lib/limits');
 
-const VERSION = '8.0.1';
+const VERSION = '8.1.0';
 
 function createApp(opts = {}) {
   const env = opts.env || process.env;
@@ -40,9 +41,13 @@ function createApp(opts = {}) {
   app.use(createInstantRouter({ sf: sfApi, cfg, queue, store, log, now }));
   app.use(createProcurementRouter());
 
-  // Ported endpoints: same settings as ce-solar-middleware v7.6.
-  app.use(express.json({ limit: '50mb' }));
+  // Ported endpoints: same settings as ce-solar-middleware v7.6, plus per-connection rate limits (8.1.0).
+  // CORS first so a refusal (429) can still be read by the browser; limits before the body is parsed.
+  const limits = getLimits(env);
+  app.locals.limits = limits;
   app.use(cors());
+  app.use(createRouteLimits(limits, log));
+  app.use(express.json({ limit: '50mb' }));
 
   app.get('/', (req, res) => {
     const st = queue.stats();
