@@ -163,7 +163,7 @@ function createInstantRouter({ sf, cfg, queue, store, log = console.log, now = (
     const { submission_id: sid, result, error } = req.body || {};
     const rec = store.get(String(sid || '').toLowerCase());
     if (!rec) return res.status(404).json({ ok: false, error: 'Unknown submission' });
-    if (error) { log(`Freddie reported an error for ${rec.submission_id}: ${error}`); queue.release(req.params.jobId); return res.json({ ok: true, requeued: true }); }
+    if (error) { log(`Freddie reported an error for ${rec.submission_id}: ${error}`); const r = queue.release(req.params.jobId); if (r.dead) log(`Gave up on ${rec.submission_id} after ${r.attempts} failed attempts; it stays saved in Salesforce for staff`); return res.json({ ok: true, requeued: r.requeued, ...(r.dead ? { gaveUp: true } : {}) }); }
     if (!validResult(result)) return res.status(400).json({ ok: false, error: 'Result is not in the expected shape' });
     if (rec.status === 'complete') return res.json({ ok: true, duplicate: true });
     store.setResult(rec.submission_id, result);

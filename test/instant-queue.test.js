@@ -40,11 +40,23 @@ test('release puts a job back at the front; complete removes it', async () => {
   const q = new JobQueue();
   const a = q.enqueue('a', payload); q.enqueue('b', payload);
   await q.claim(10);
-  assert.equal(q.release(a.job_id), true);
+  assert.deepEqual(q.release(a.job_id), { requeued: true, attempts: 1 });
   assert.equal((await q.claim(10)).submission_id, 'a');
   assert.equal(q.complete(a.job_id), true);
   assert.equal(q.get(a.job_id), null);
-  assert.equal(q.release('nope'), false);
+  assert.equal(q.release('nope').requeued, false);
+});
+
+test('a job that keeps failing is given up on after three attempts, not retried forever', async () => {
+  const q = new JobQueue();
+  const a = q.enqueue('a', payload);
+  for (let i = 1; i <= 2; i++) { await q.claim(10); assert.equal(q.release(a.job_id).requeued, true); }
+  await q.claim(10);
+  const last = q.release(a.job_id);
+  assert.equal(last.requeued, false); assert.equal(last.dead, true); assert.equal(last.attempts, 3);
+  assert.equal(await q.claim(10), null, 'nothing left to hand out');
+  assert.equal(q.stats().failed, 1);
+  assert.equal(q.get(a.job_id), null);
 });
 
 test('submission store: waiters are released by a result, or time out', async () => {

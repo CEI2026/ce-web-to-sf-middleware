@@ -1,6 +1,6 @@
 {
   "name": "ce-web-to-sf-middleware",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "Catholic Energies web forms to Salesforce middleware: lookups, Solar Assessment, Desk Audit, Instant Audit (with the Freddie job relay), Procurement stub",
   "main": "server.js",
   "engines": {

@@ -132,15 +132,23 @@ test('a result posted twice is stored once; a malformed result is refused', asyn
   } finally { s.close(); }
 });
 
-test('Freddie reports a failure: the job goes back in the queue', async () => {
+test('Freddie reports a failure: the job goes back in the queue, but only three times', async () => {
   const s = await start({ ...LIVE, INSTANT_AUDIT_WAIT_MS: '200' });
   try {
     await post(s.base, '/instant-audit', fx('submission_chancery_12_months.json'));
     const j1 = (await signed(s.base, SECRET, 'GET', '/instant-audit/jobs/next?wait=1')).body;
-    const r = await signed(s.base, SECRET, 'POST', `/instant-audit/jobs/${j1.job_id}/result`, { submission_id: SID, error: 'model out of memory' });
-    assert.equal(r.body.requeued, true);
+    const fail = id => signed(s.base, SECRET, 'POST', `/instant-audit/jobs/${id}/result`, { submission_id: SID, error: 'model out of memory' });
+    const r1 = await fail(j1.job_id);
+    assert.equal(r1.body.requeued, true);
     const j2 = (await signed(s.base, SECRET, 'GET', '/instant-audit/jobs/next?wait=1')).body;
     assert.equal(j2.job_id, j1.job_id);
+    assert.equal((await fail(j2.job_id)).body.requeued, true);
+    await signed(s.base, SECRET, 'GET', '/instant-audit/jobs/next?wait=1');
+    const r3 = await fail(j1.job_id);
+    assert.equal(r3.body.gaveUp, true); assert.equal(r3.body.requeued, false);
+    assert.equal((await signed(s.base, SECRET, 'GET', '/instant-audit/jobs/next?wait=0')).status, 204, 'not handed out again');
+    assert.equal((await get(s.base, `/instant-audit/${SID}`)).body.status, 'queued', 'the client still sees the saved message');
+    assert.equal((await get(s.base, '/')).body.instantAudit.freddie.gaveUp, 1);
   } finally { s.close(); }
 });
 

@@ -49,7 +49,8 @@ connects in to Freddie. The app never scores anything itself. Design: the build 
   A job that is claimed but not answered within 2 minutes goes back in the queue.
 - `POST /instant-audit/jobs/:jobId/result` with `{submission_id, result}`. Posting again is
   harmless (`{ok:true, duplicate:true}`). To report a failure: `{submission_id, error:"..."}`;
-  the job goes back in the queue. `result` needs `light`, `headline`, `annual_spend`, and
+  the job goes back in the queue, up to 3 attempts in all; after that it is given up on
+  (`{gaveUp:true}`), stays saved in Salesforce for staff, and the health page counts it under `gaveUp`. `result` needs `light`, `headline`, `annual_spend`, and
   `summary {used[], means, next}`; see `fixtures/response_complete_*.json`.
 - `POST /instant-audit/jobs/:jobId/report` with `{submission_id, filename, pdf_base64}`
   (a real PDF, up to 3 MB).
@@ -90,7 +91,7 @@ Salesforce admin confirms different names, change them there only.
 ## Run and test
 
     npm install
-    npm test                    # 47 tests, no network, no Salesforce
+    npm test                    # 48 tests, no network, no Salesforce
     INSTANT_AUDIT_MOCK=true SF_CLIENT_ID=x SF_CLIENT_SECRET=y npm start
 
 ## Deploy (first time)
@@ -101,7 +102,7 @@ Salesforce admin confirms different names, change them there only.
    "GitHub Repo" field says `CEI2026/ce-web-to-sf-middleware` before editing any variable.**
 3. Start with `INSTANT_AUDIT_MOCK=true`. **Deploy manually** (Deploy tab, Manual deploy, `main`);
    do not rely on auto-deploy.
-4. Check: `curl https://<app>.herokuapp.com/` shows `"version":"8.0.0"` and `"mode":"mock"`.
+4. Check: `curl https://<app>.herokuapp.com/` shows `"version":"8.0.1"` and `"mode":"mock"`.
 
 ## Cutover, one form at a time (the old app stays up the whole time)
 

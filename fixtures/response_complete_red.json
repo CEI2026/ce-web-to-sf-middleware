@@ -16,20 +16,24 @@
     },
     {
      "lead": "Comparison",
-     "text": "Energy use is 14.2 kBtu per square foot a year. A typical place of worship uses 30.5, so this building uses 0.47 times as much (no more than typical)."
+     "text": "Energy use is 14.2 kBtu per square foot a year. A typical place of worship uses 32.0, so this building uses 0.44 times as much (no more than typical)."
+    },
+    {
+     "lead": "Climate",
+     "text": "The comparison figure is adjusted for climate. This building is in a cool climate zone, so a typical place of worship is taken as 32.0 instead of the national 30.5."
     },
     {
      "lead": "Electricity price",
      "text": "Electricity costs $0.179 per kWh, well above the Indiana average of $0.1244 for businesses."
     }
    ],
-   "means": "At this level of spending, an energy project is unlikely to pay for itself. That doesn't mean nothing can be saved; it means other sites are a better use of time right now.",
+   "means": "Your yearly energy costs are below the level where an energy project is likely to pay for itself. That doesn't mean nothing can be saved; it means other sites are a better use of time right now.",
    "next": "No action needed. If your costs change or you have a project in mind, run the audit again.",
    "note": "kBtu (a thousand British thermal units) is a standard unit that lets electricity and gas be added together."
   },
   "honesty_line": "This is a quick first look to help decide where to spend time. It is not an energy assessment, and it does not estimate savings.",
   "assumptions_version": "ceos-2026-10-r5",
-  "generated_utc": "2026-10-06T22:00:00Z"
+  "generated_utc": "2026-10-07T02:31:54.533649+00:00"
  },
  "report": {
   "state": "unavailable",

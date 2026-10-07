@@ -1,6 +1,6 @@
 'use strict';
 // ============================================================
-//  Catholic Energies Web-to-Salesforce Middleware  v8.0.0
+//  Catholic Energies Web-to-Salesforce Middleware  v8.0.1
 //
 //  Successor to ce-solar-middleware (v7.6). One app for the public forms that write
 //  to Salesforce. Moved here UNCHANGED (code ported line for line, behavior proven
@@ -21,7 +21,7 @@ const { recoverPending } = require('./lib/instant/recover');
 const { createInstantRouter } = require('./routes/instant-audit');
 const { createProcurementRouter } = require('./routes/procurement');
 
-const VERSION = '8.0.0';
+const VERSION = '8.0.1';
 
 function createApp(opts = {}) {
   const env = opts.env || process.env;
@@ -57,7 +57,7 @@ function createApp(opts = {}) {
         salesforceWrites: cfg.sfWrite,
         freddie: {
           lastPollSecondsAgo: st.lastPollAt ? Math.round((now() - st.lastPollAt) / 1000) : null,
-          queued: st.queued, claimed: st.claimed,
+          queued: st.queued, claimed: st.claimed, gaveUp: st.failed,
         },
       },
       procurement: 'stub',

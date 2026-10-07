@@ -16,24 +16,28 @@
     },
     {
      "lead": "Comparison",
-     "text": "Energy use is 68.0 kBtu per square foot a year. A typical office building uses 52.9, so this building uses 1.29 times as much (above typical)."
+     "text": "Energy use is 68.0 kBtu per square foot a year. A typical office building uses 55.5, so this building uses 1.22 times as much (above typical)."
+    },
+    {
+     "lead": "Climate",
+     "text": "The comparison figure is adjusted for climate. This building is in a mixed-mild climate zone, so a typical office building is taken as 55.5 instead of the national 52.9."
     },
     {
      "lead": "Electricity price",
      "text": "Electricity costs $0.188 per kWh, well above the Tennessee average of $0.1205 for businesses."
     }
    ],
-   "means": "Your building spends a significant amount on energy and uses more than similar buildings. A short conversation with Catholic Energies could show where the energy goes.",
+   "means": "Your building uses more energy than similar buildings, and its energy costs are significant. A short conversation with Catholic Energies could show where the energy goes.",
    "next": "We'll be in touch to talk it through. This is a first look, not an energy assessment.",
    "note": "kBtu (a thousand British thermal units) is a standard unit that lets electricity and gas be added together."
   },
   "honesty_line": "This is a quick first look to help decide where to spend time. It is not an energy assessment, and it does not estimate savings.",
   "assumptions_version": "ceos-2026-10-r5",
-  "generated_utc": "2026-10-06T22:00:00Z"
+  "generated_utc": "2026-10-07T02:31:54.531442+00:00"
  },
  "report": {
   "state": "ready",
   "url": "https://example.invalid/instant-audit/11111111-1111-4111-8111-111111111111/report?t=SIGNED_TOKEN",
-  "filename": "Instant_Audit_Report.pdf"
+  "filename": "Instant Audit - Chancery - 2026-10-07.pdf"
  }
 }

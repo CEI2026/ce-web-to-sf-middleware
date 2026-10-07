@@ -4,7 +4,7 @@
  "submission_id": "22222222-2222-4222-8222-222222222222",
  "result": {
   "light": "yellow",
-  "headline": "One open question",
+  "headline": "We need a little more information",
   "annual_spend": 41310,
   "basis": "client_entered",
   "basis_label": "From figures you entered; not checked against bills",
@@ -16,20 +16,24 @@
     },
     {
      "lead": "Comparison",
-     "text": "Energy use was not compared with similar buildings yet: the figures cover less than a full year. (For reference: 78.0 kBtu per square foot against 52.9 for a typical office building.)"
+     "text": "Energy use was not compared with similar buildings yet: the figures cover less than a full year. (For reference: 78.0 kBtu per square foot against 55.5 for a typical office building.)"
+    },
+    {
+     "lead": "Climate",
+     "text": "The comparison figure is adjusted for climate. This building is in a mixed-mild climate zone, so a typical office building is taken as 55.5 instead of the national 52.9."
     },
     {
      "lead": "Electricity price",
      "text": "Electricity costs $0.187 per kWh, well above the Tennessee average of $0.1205 for businesses."
     }
    ],
-   "means": "We can't yet say whether a closer look would pay off. We need a full year of figures to compare your energy use fairly.",
+   "means": "We can't yet say whether a closer look would pay off. We need a full year of figures to compare your energy use fairly across the seasons.",
    "next": "Add the missing months, or upload your bills, and run the audit again.",
    "note": "kBtu (a thousand British thermal units) is a standard unit that lets electricity and gas be added together."
   },
   "honesty_line": "This is a quick first look to help decide where to spend time. It is not an energy assessment, and it does not estimate savings.",
   "assumptions_version": "ceos-2026-10-r5",
-  "generated_utc": "2026-10-06T22:00:00Z"
+  "generated_utc": "2026-10-07T02:50:43.834830+00:00"
  },
  "report": {
   "state": "preparing",
