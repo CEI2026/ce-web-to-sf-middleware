@@ -103,7 +103,7 @@ Salesforce admin confirms different names, change them there only.
    "GitHub Repo" field says `CEI2026/ce-web-to-sf-middleware` before editing any variable.**
 3. Start with `INSTANT_AUDIT_MOCK=true`. **Deploy manually** (Deploy tab, Manual deploy, `main`);
    do not rely on auto-deploy.
-4. Check: `curl https://<app>.herokuapp.com/` shows `"version":"8.1.2"` and `"mode":"mock"`.
+4. Check: `curl https://<app>.herokuapp.com/` shows `"version":"8.1.3"` and `"mode":"mock"`.
 
 ## Cutover, one form at a time (the old app stays up the whole time)
 

@@ -45,7 +45,7 @@ test('full flow: saved first, Freddie fetches the job, the browser gets the resu
     assert.equal(records.length, 24);
     const first = records.find(x => x.Fuel__c === 'Electric' && x.Period_Month__c === '2025-06-01');
     assert.equal(first.Usage__c, 18660); assert.equal(first.Usage_Unit__c, 'kWh'); assert.equal(first.Cost__c, 3420.5);
-    assert.equal(first.Source__c, 'Client entered'); assert.equal(first.Submission_ID__c, SID);
+    assert.equal(first.Source__c, 'Client Entered'); assert.equal(first.Submission_ID__c, SID);
     assert.equal(first.Building__c, 'a1O000000000TEST');
     assert.ok(records.some(x => x.Fuel__c === 'Natural gas' && x.Usage_Unit__c === 'therms'));
     await sleep(80);

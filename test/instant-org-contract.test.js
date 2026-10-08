@@ -15,7 +15,7 @@ test('Utility_Month__c API names and picklist values', () => {
   });
   assert.deepEqual(Object.values(S.FUELS).sort(), ['Electric', 'Natural gas', 'Other']);          // Fuel__c
   assert.deepEqual(Object.values(S.UNITS).sort(), ['ccf', 'kWh', 'therms']);                       // Usage_Unit__c (also Other)
-  assert.equal(S.SF.sourceClientEntered, 'Client entered');   // Source__c must contain this value (the org had only "Value1" on 2026-10-07)
+  assert.equal(S.SF.sourceClientEntered, 'Client Entered');   // Source__c picklist: Client Entered, Bill Read
 });
 
 test('Buildings__c API names', () => {

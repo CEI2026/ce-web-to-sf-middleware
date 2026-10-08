@@ -125,7 +125,7 @@ test('health check reports version, Instant Audit mode and Freddie contact', asy
   const s = await start(MOCK);
   try {
     const h = (await get(s.base, '/')).body;
-    assert.equal(h.status, 'ok'); assert.equal(h.version, '8.1.2');
+    assert.equal(h.status, 'ok'); assert.equal(h.version, '8.1.3');
     assert.equal(h.instantAudit.mode, 'mock'); assert.equal(h.instantAudit.salesforceWrites, false);
     assert.equal(h.instantAudit.freddie.lastPollSecondsAgo, null);
     assert.equal(h.procurement, 'stub');
