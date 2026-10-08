@@ -21,7 +21,7 @@ function salesforce(enteredAt) {
       if (/FROM Buildings__c/.test(soql)) return [{
         Id: clean.building.building_id, Account__c: clean.building.account_id, Name: 'Chancery',
         Full_Address__c: '805 Northshore Dr, Knoxville, TN 37902', Client_SQFT__c: 15848, Client_Confirmed_County_SQFT__c: false,
-        Client_Heating_Fuel__c: 'gas', Client_Building_Type__c: 'Office or chancery', Client_Reasons_To_Look__c: 'Equipment replacement or renovation is planned or needed;A grant, requirement or budget deadline applies',
+        Client_Heating_Fuel__c: 'Gas', Client_building_type__c: 'Office or Chancery', Client_Reasons_to_Look__c: 'Equipment replacement or renovation is planned or needed;A grant, requirement or budget deadline applies',
         Client_Shared_Meter_Note__c: null, Client_Electric_Spend__c: 31959.4, Client_Gas_Spend__c: 6399.3,
         Building_Contact__r: { Name: 'Test Contact', Email: 'test.contact@example.org', Phone: null },
       }];
@@ -77,4 +77,14 @@ test('a yearly-totals submission is rebuilt from the spend fields', async () => 
 test('nothing pending: nothing to do', async () => {
   const sf = { getSFToken: async () => ({ access_token: 'T', instance_url: 'u' }), sfQuery: async () => [] };
   assert.deepEqual(await rebuildPending({ sf, now: NOW }), []);
+});
+
+test('heating fuel is read back from the org picklist: "Gas" becomes gas, "Other" or blank becomes none', async () => {
+  const mk = fuel => { const sf = salesforce('2026-10-06T19:00:00Z'); const q = sf.sfQuery;
+    sf.sfQuery = async (i, t, soql) => { const r = await q(i, t, soql); if (/FROM Buildings__c/.test(soql)) r[0].Client_Heating_Fuel__c = fuel; return r; };
+    return sf; };
+  for (const [stored, expected] of [['Gas', 'gas'], ['Electric', 'electric'], ['Oil', 'oil'], ['Steam', 'steam'], ['gas', 'gas'], ['Other', 'none'], [null, 'none']]) {
+    const [p] = await rebuildPending({ sf: mk(stored), now: NOW });
+    assert.equal(p.facts.heating_fuel, expected, `stored ${stored}`);
+  }
 });

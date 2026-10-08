@@ -22,7 +22,7 @@ const { createInstantRouter } = require('./routes/instant-audit');
 const { createProcurementRouter } = require('./routes/procurement');
 const { getLimits, createRouteLimits } = require('./lib/limits');
 
-const VERSION = '8.1.0';
+const VERSION = '8.1.2';
 
 function createApp(opts = {}) {
   const env = opts.env || process.env;

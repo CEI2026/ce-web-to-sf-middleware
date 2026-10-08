@@ -45,21 +45,21 @@ test('full flow: saved first, Freddie fetches the job, the browser gets the resu
     assert.equal(records.length, 24);
     const first = records.find(x => x.Fuel__c === 'Electric' && x.Period_Month__c === '2025-06-01');
     assert.equal(first.Usage__c, 18660); assert.equal(first.Usage_Unit__c, 'kWh'); assert.equal(first.Cost__c, 3420.5);
-    assert.equal(first.Source__c, 'Client entered'); assert.equal(first.Submission_Id__c, SID);
+    assert.equal(first.Source__c, 'Client entered'); assert.equal(first.Submission_ID__c, SID);
     assert.equal(first.Building__c, 'a1O000000000TEST');
     assert.ok(records.some(x => x.Fuel__c === 'Natural gas' && x.Usage_Unit__c === 'therms'));
     await sleep(80);
     const patches = s.sf.of('sfPatch').map(c => c.args[4]);
-    const pending = patches.find(p => p.Screening_Status__c === 'Instant audit pending');
+    const pending = patches.find(p => p.Screening_Status__c === 'Instant Audit Pending');
     assert.equal(pending.Client_SQFT__c, 15848);
-    assert.equal(pending.Client_Building_Type__c, 'Office or chancery');
-    assert.equal(pending.Client_Heating_Fuel__c, 'gas');
+    assert.equal(pending.Client_building_type__c, 'Office or Chancery');
+    assert.equal(pending.Client_Heating_Fuel__c, 'Gas');   // the org's picklist value, capitalised
     assert.equal(pending.Client_Electric_Spend__c, 31959.4);
     assert.equal(pending.Client_Gas_Spend__c, 6399.3);
     assert.equal(pending.Building_Contact__c, '003CONTACT');
-    const done = patches.find(p => p.Screening_Status__c === 'Instant audit completed');
+    const done = patches.find(p => p.Screening_Status__c === 'Instant Audit Completed');
     assert.equal(done.Screening_Light__c, 'Green'); assert.equal(done.Screening_Annual_Spend__c, 38359);
-    assert.equal(done.Screening_Basis__c, 'Client entered figures'); assert.equal(done.Screening_Assumptions_Version__c, 'ceos-2026-10-r5');
+    assert.equal(done.Screening_Basis__c, 'Client Entered Figures'); assert.equal(done.Screening_Assumptions_Version__c, 'ceos-2026-10-r5');
     const up = s.sf.of('uploadOneFileToSF')[0].args;
     assert.equal(up[2], 'a1O000000000TEST'); assert.equal(up[3].name, 'Instant Audit - Chancery.pdf');
     assert.equal(Buffer.from(up[3].data, 'base64').slice(0, 4).toString(), '%PDF');
@@ -85,7 +85,7 @@ test('Freddie not available: the browser is told "queued"; the result still arri
     const later = (await get(s.base, `/instant-audit/${SID}`)).body;
     assert.equal(later.status, 'complete'); assert.equal(later.result.light, 'green');
     await sleep(80);
-    assert.ok(s.sf.of('sfPatch').some(c => c.args[4].Screening_Status__c === 'Instant audit completed'), 'result written after the browser stopped waiting');
+    assert.ok(s.sf.of('sfPatch').some(c => c.args[4].Screening_Status__c === 'Instant Audit Completed'), 'result written after the browser stopped waiting');
   } finally { s.close(); }
 });
 
