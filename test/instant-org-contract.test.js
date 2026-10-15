@@ -23,7 +23,7 @@ test('Buildings__c API names', () => {
     sqft: 'Client_SQFT__c', confirmedCounty: 'Client_Confirmed_County_SQFT__c', heatingFuel: 'Client_Heating_Fuel__c',
     type: 'Client_building_type__c', reasons: 'Client_Reasons_to_Look__c', sharedNote: 'Client_Shared_Meter_Note__c',
     electricSpend: 'Client_Electric_Spend__c', gasSpend: 'Client_Gas_Spend__c', contact: 'Building_Contact__c',
-    status: 'Screening_Status__c', light: 'Screening_Light__c', headline: 'Screening_Headline__c',
+    status: 'Screening_Status__c', instantStatus: 'Instant_Audit_Status__c', light: 'Screening_Light__c', headline: 'Screening_Headline__c',
     annualSpend: 'Screening_Annual_Spend__c', basis: 'Screening_Basis__c', assumptions: 'Screening_Assumptions_Version__c',
     resultAt: 'Screening_Result_At__c',
   });

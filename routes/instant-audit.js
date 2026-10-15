@@ -95,7 +95,7 @@ function createInstantRouter({ sf, cfg, queue, store, log = console.log, now = (
 
     const rec = store.create(id, { payload: clean });
     try {
-      await sfwrite.saveSubmission({ sf, clean, totals: v.totals, nowIso: new Date(now()).toISOString(), dryRun: !cfg.sfWrite, log });
+      await sfwrite.saveSubmission({ sf, clean, totals: v.totals, nowIso: new Date(now()).toISOString(), dryRun: !cfg.sfWrite, splitStatus: !!cfg.splitStatus, log });
     } catch (e) {
       store.map.delete(id);
       log('POST /instant-audit save failed:', e.message);
@@ -168,7 +168,7 @@ function createInstantRouter({ sf, cfg, queue, store, log = console.log, now = (
     if (rec.status === 'complete') return res.json({ ok: true, duplicate: true });
     store.setResult(rec.submission_id, result);
     queue.complete(req.params.jobId);
-    sfwrite.saveResult({ sf, buildingId: rec.building_id, result, nowIso: new Date(now()).toISOString(), dryRun: !cfg.sfWrite, log })
+    sfwrite.saveResult({ sf, buildingId: rec.building_id, result, nowIso: new Date(now()).toISOString(), dryRun: !cfg.sfWrite, splitStatus: !!cfg.splitStatus, log })
       .catch(e => log('saving the result to Salesforce failed:', e.message));
     res.json({ ok: true });
   });

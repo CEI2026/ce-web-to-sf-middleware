@@ -21,8 +21,10 @@ const { recoverPending } = require('./lib/instant/recover');
 const { createInstantRouter } = require('./routes/instant-audit');
 const { createProcurementRouter } = require('./routes/procurement');
 const { getLimits, createRouteLimits } = require('./lib/limits');
+const billsLib = require('./lib/bills');
+const { createMailer } = require('./lib/mailer');
 
-const VERSION = '8.1.3';
+const VERSION = '8.2.0';
 
 function createApp(opts = {}) {
   const env = opts.env || process.env;
@@ -32,6 +34,9 @@ function createApp(opts = {}) {
   const queue = opts.queue || new JobQueue({ claimTimeoutMs: cfg.claimTimeoutMs });
   const store = opts.store || new SubmissionStore();
   const now = opts.now || (() => Date.now());
+  const billsCfg = opts.billsConfig || billsLib.getBillsConfig(env);
+  // Bill sets (CR-S4) and Instant Audit's separate status switch together.
+  if (billsCfg.enabled && !cfg.splitStatus) cfg.splitStatus = true;
 
   const app = express();
   app.set('trust proxy', 1);                     // Heroku: the real client address is in X-Forwarded-For
@@ -49,6 +54,11 @@ function createApp(opts = {}) {
   app.use(createRouteLimits(limits, log));
   app.use(express.json({ limit: '50mb' }));
 
+  const mailer = opts.mailer || createMailer(billsCfg.mail, undefined, log);
+  const codes = opts.codes || new billsLib.CodeStore({ secret: billsCfg.secret, ttlMs: billsCfg.codeTtlMs,
+    maxAttempts: billsCfg.maxAttempts, maxSends: billsCfg.maxCodesPer15Min, now });
+  app.locals.billsCodes = codes; app.locals.billsCfg = billsCfg;
+
   app.get('/', (req, res) => {
     const st = queue.stats();
     res.json({
@@ -65,11 +75,13 @@ function createApp(opts = {}) {
           queued: st.queued, claimed: st.claimed, gaveUp: st.failed,
         },
       },
+      billSets: billsCfg.enabled ? { enabled: true, reuseDays: billsCfg.reuseDays, mail: mailer.configured ? 'configured' : 'NOT configured' } : { enabled: false },
       procurement: 'stub',
       endpoints: [
         'GET  /accounts?zip=XXXXX', 'GET  /buildings?accountId=XXXXX', 'GET  /institutions', 'POST /accounts',
         'POST /submit',
         'POST /screening-request', 'POST /screening-file', 'POST /screening-complete',
+        'POST /bills/options', 'POST /bills/send-code', 'POST /bills/verify', 'POST /bills/request-help',
         'POST /instant-audit', 'GET  /instant-audit/:id', 'GET  /instant-audit/:id/report',
         'GET  /instant-audit/jobs/next (Freddie)', 'POST /instant-audit/jobs/:jobId/result (Freddie)', 'POST /instant-audit/jobs/:jobId/report (Freddie)',
         'GET  /procurement (stub)', 'POST /procurement-request (stub, 501)',
@@ -90,7 +102,9 @@ function createApp(opts = {}) {
     // Upload tokens are signed with SCREENING_UPLOAD_SECRET when set, otherwise with the
     // Salesforce client secret (never sent to clients).
     uploadSecret: env.SCREENING_UPLOAD_SECRET || env.SF_CLIENT_SECRET || 'dev-only-secret',
+    billsCfg, now,
   });
+  require('./routes/bills').register(app, { ...common, cfg: billsCfg, codes, mailer, log, now });
 
   return app;
 }
@@ -108,6 +122,8 @@ if (require.main === module) {
     if (!cfg.allowedOrigins.length) console.log('Note: INSTANT_AUDIT_ALLOWED_ORIGINS is empty, so any website can call Instant Audit.');
   });
   setInterval(() => store.purge(), 3600 * 1000).unref();
+  setInterval(() => app.locals.billsCodes.purge(), 3600 * 1000).unref();
+  console.log(`Bill sets (CR-S4): ${app.locals.billsCfg.enabled ? 'ENABLED' : 'off'}`);
   if (cfg.sfWrite && !cfg.mock) {
     const recover = () => recoverPending({ sf: sfApi, store, queue }).catch(e => console.error('recovery failed:', e.message));
     setTimeout(recover, 30 * 1000).unref();

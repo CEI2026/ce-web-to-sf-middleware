@@ -82,6 +82,10 @@ Copy the first group from the Heroku app of `ce-solar-middleware` (same Salesfor
 | `INSTANT_AUDIT_SF_WRITE` | no | Leave **off** until change request CR-S3 is live and the API names are confirmed |
 | `INSTANT_AUDIT_ALLOWED_ORIGINS` | recommended | Comma-separated website origins (the Netlify sites) allowed to call Instant Audit |
 | `LOOKUP_RATE_PER_HOUR`, `SUBMIT_RATE_PER_HOUR`, `FILE_RATE_PER_HOUR`, `REGISTER_RATE_PER_HOUR` | no | Per-connection limits on the ported public endpoints (8.1.0). Defaults 120 (each lookup), 20 (each of /submit, /screening-request, /screening-complete), 300 (/screening-file, one request per bill), 5 (registering an institution). `0` turns a limit off. A refusal is HTTP 429 |
+| `BILL_SETS_ENABLED` | no | **8.2.0, change request CR-S4.** Off by default; with it off the service behaves exactly as 8.1.3. On: uploaded bills are kept as a *bill set* (`Bill_Upload__c`) that the same building can reuse for a Desk Audit or Solar Assessment after an emailed 6-digit code; Instant Audit writes `Instant_Audit_Status__c` instead of `Screening_Status__c` |
+| `MAIL_PROVIDER`, `MAIL_API_KEY`, `MAIL_FROM`, `MAIL_FROM_NAME` | with bill sets | Sends the verification code. `postmark` or `sendgrid`; the sender must be verified with the provider. Without them `/bills/send-code` answers 503 and the page offers staff help |
+| `BILLS_REUSE_DAYS`, `BILLS_SESSION_SECRET`, `BILLS_STAFF_TASK_OWNER_ID` | no | Reuse window (default 395 days), session signing secret, Salesforce User Id that gets help tasks |
+| `BILLS_RATE_PER_HOUR`, `BILLS_CODE_RATE_PER_HOUR` | no | Per-connection limits on `/bills/options` + `/bills/verify` (30) and `/bills/send-code` + `/bills/request-help` (10) |
 | `PUBLIC_BASE_URL` | recommended | This app's address, for report links |
 | `REPORT_LINK_SECRET` | no | Signs report links; defaults to `FREDDIE_JOB_SECRET` |
 | `INSTANT_AUDIT_WAIT_MS`, `..._RATE_PER_HOUR`, `..._RATE_PER_BUILDING_DAY`, `..._CLAIM_TIMEOUT_MS`, `..._REPORT_GRACE_MS` | no | Tuning; defaults 12000, 10, 5, 120000, 120000 |

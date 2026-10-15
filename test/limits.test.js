@@ -9,7 +9,7 @@ const small = { LOOKUP_RATE_PER_HOUR: '3', SUBMIT_RATE_PER_HOUR: '2', FILE_RATE_
 test('defaults are generous for people and set from the environment', async () => {
   const t = await start();
   try {
-    assert.deepStrictEqual(t.app.locals.limits, { lookupPerHour: 120, submitPerHour: 20, filePerHour: 300, registerPerHour: 5 });
+    assert.deepStrictEqual(t.app.locals.limits, { lookupPerHour: 120, submitPerHour: 20, filePerHour: 300, registerPerHour: 5, billsPerHour: 30, billsCodePerHour: 10 });
   } finally { t.close(); }
   const t2 = await start({ LOOKUP_RATE_PER_HOUR: '7', SUBMIT_RATE_PER_HOUR: 'junk', FILE_RATE_PER_HOUR: '0' });
   try {

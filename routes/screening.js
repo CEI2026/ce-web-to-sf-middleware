@@ -62,6 +62,7 @@ const MAX_SEPARATE_B64 = Math.ceil(MAX_SEPARATE_BYTES / 3) * 4 + 4;
 const UPLOAD_TOKEN_TTL_MS = 2 * 60 * 60 * 1000;
 const BILL_EXT = /\.(pdf|jpe?g|png)$/i;
 const crypto = require('crypto');
+const bills = require('../lib/bills');   // 8.2.0 (CR-S4): bill sets and reuse, behind BILL_SETS_ENABLED
 const COUNTY_MISMATCH_RATIO = 2.0;
 
 function isSfId(v) {
@@ -83,6 +84,7 @@ function str(v, max) {
 // Returns { ok:true, buildings:[normalized...] } or { ok:false, errors:[...] }
 function validate(payload) {
   const separate = payload && payload.upload_mode === 'separate';
+  const reuse = !!(payload && payload.reuse && typeof payload.reuse === 'object');   // 8.2.0: earlier bills, no new files
   const errors = [];
   const accountId = str(payload.sf_account_id, 18);
   if (!isSfId(accountId)) errors.push('Institution is not valid.');
@@ -112,7 +114,7 @@ function validate(payload) {
     if ((elec !== null && elec !== 'bad' && elec < 0) || (gas !== null && gas !== 'bad' && gas < 0))
       errors.push(`${label}: annual spend cannot be negative.`);
     const files = Array.isArray(b.bill_files) ? b.bill_files : [];
-    if (elec === null && gas === null && !files.length)
+    if (elec === null && gas === null && !files.length && !reuse)
       errors.push(`${label}: enter last year's energy spend, or attach energy bills, or both.`);
     if (files.length > MAX_FILES_PER_BUILDING) errors.push(`${label}: at most ${MAX_FILES_PER_BUILDING} bill files.`);
     files.forEach(f => {
@@ -175,13 +177,13 @@ function validate(payload) {
   });
 
   if (errors.length) return { ok: false, errors };
-  return { ok: true, separate, accountId, contact: {
+  return { ok: true, separate, reuse: reuse ? payload.reuse : null, accountId, contact: {
     first_name: str(contact.first_name, 60), last_name: str(contact.last_name, 60),
     email, phone: str(contact.phone, 40), title: str(contact.role || contact.title, 80),
   }, buildings };
 }
 
-function screeningFields(b, nowIso, contactId, separate) {
+function screeningFields(b, nowIso, contactId, separate, o = {}) {
   const f = {
     Client_SQFT__c:                  b.sqft,
     Client_Confirmed_County_SQFT__c: !!b.confirmed,
@@ -200,6 +202,23 @@ function screeningFields(b, nowIso, contactId, separate) {
     Bill_Filenames__c:               b.files.map(x => x.name).join(', ') || 'None',
   };
   if (contactId) f.Building_Contact__c = contactId;
+  if (o.billSets) {
+    // 8.2.0. A Solar-only request must not touch the Desk Audit queue: it neither clears an open
+    // "Requested" nor restamps its time. A Desk Audit request always names its bill set (or none), so a
+    // bill set from an earlier request can never be picked up by mistake.
+    if (!o.want.desk) { delete f.Screening_Status__c; delete f.Screening_Requested_At__c; }
+    else {
+      f.Screening_Requested_By__c = o.requestedBy || null;
+      f.Screening_Bill_Upload__c = o.reuse ? o.reuse.id : null;
+      f.Screening_Bill_Source__c = o.reuse ? 'Reused earlier upload' : null;
+    }
+    if (o.reuse) {
+      f.Bill_Count__c = o.reuse.count;
+      f.Bill_Filenames__c = o.reuse.names.join(', ') || 'None';
+      if (o.want.desk) f.Screening_Status__c = 'Requested';      // the files already exist: nothing more to upload
+      if (o.want.solar) f.Solar_Bill_Upload__c = o.reuse.id;
+    }
+  }
   return f;
 }
 
@@ -222,14 +241,38 @@ function submissionId() {
 }
 
 function register(app, deps) {
+  const BC = deps.billsCfg || { enabled: false };      // 8.2.0: bill sets; off = exactly the 8.1.3 behavior
+  const nowMs = deps.now || (() => Date.now());
+
   app.post('/screening-request', async (req, res) => {
     const { getSFToken, sfPost, sfPatch, findOrCreateContact, findExistingBuilding, uploadFilesToSF } = deps;
+    if (req.body && req.body.reuse && !BC.enabled)
+      return res.status(503).json({ success: false, errors: ['Reusing earlier bills is not available yet. Please upload your bills.'] });
     const v = validate(req.body || {});
     if (!v.ok) return res.status(400).json({ success: false, errors: v.errors });
 
+    // What the client asked for. Requests from older pages carry no "want": that is a Desk Audit.
+    const wantRaw = (req.body && req.body.want) || {};
+    const want = BC.enabled ? { desk: wantRaw.desk !== false, solar: !!wantRaw.solar } : { desk: true, solar: false };
+    if (BC.enabled && !want.desk && !want.solar) want.desk = true;
+
     const sid = submissionId();
-    const nowIso = new Date().toISOString();
+    const nowIso = new Date(nowMs()).toISOString();
     try {
+      // Earlier bills: the verification session, the building and the upload are all checked BEFORE anything is written.
+      let reuseUp = null;
+      if (v.reuse) {
+        const only = v.buildings[0];
+        if (v.buildings.length !== 1 || only.manual || only.files.length)
+          return res.status(400).json({ success: false, errors: ['Earlier bills can be reused for one existing building, with no new files.'] });
+        try {
+          reuseUp = await bills.resolveReuse(deps, BC, { session: v.reuse.session, buildingId: only.sf_building_id,
+            uploadId: String(v.reuse.bill_upload_id || ''), nowMs: nowMs() });
+        } catch (e) {
+          if (e instanceof bills.BillsError) return res.status(e.status).json({ success: false, errors: [e.message], verifyAgain: !!e.verifyAgain });
+          throw e;
+        }
+      }
       const { access_token, instance_url } = await getSFToken();
       // The shared helper (server.js, also used by the Solar Assessment
       // Form) reads firstname/lastname.
@@ -239,7 +282,8 @@ function register(app, deps) {
       const results = [];
 
       for (const b of v.buildings) {
-        const fields = screeningFields(b, nowIso, contactId, v.separate);
+        const fields = screeningFields(b, nowIso, contactId, v.separate, BC.enabled
+          ? { billSets: true, want, reuse: reuseUp, requestedBy: v.contact.email } : {});
         let buildingId, action;
         if (b.manual) {
           const existing = await findExistingBuilding(instance_url, access_token, v.accountId, b.name);
@@ -261,9 +305,19 @@ function register(app, deps) {
           buildingId = b.sf_building_id; action = 'updated';
         }
         const rec = { building: b.label, action, buildingId, unit: b.unit, files: b.files.length, flags: b.flags };
-        if (v.separate && b.files.length) {
+        if (reuseUp) {
+          await bills.markReused(deps, reuseUp, want, nowIso);
+          rec.reused = true; rec.billUploadId = reuseUp.id; rec.files = reuseUp.count;
+          console.log(`[${sid}] reused bill upload ${reuseUp.id} (${reuseUp.count} files) for ${buildingId}`);
+        } else if (v.separate && b.files.length) {
           rec.uploadToken = signUpload(deps.uploadSecret, buildingId, sid);
           rec.maxFileBytes = MAX_SEPARATE_BYTES;
+          if (BC.enabled) {
+            rec.billUploadId = await bills.createUpload(deps, BC, { buildingId, sid, nowIso, contactId,
+              email: v.contact.email, name: `${v.contact.first_name} ${v.contact.last_name}`.trim(),
+              purposes: [want.desk && 'Desk Audit', want.solar && 'Solar Assessment'].filter(Boolean),
+              consentVersion: String((req.body && req.body.consent_version) || '').slice(0, 40) });
+          }
         } else if (b.files.length) {
           await uploadFilesToSF(instance_url, access_token, buildingId, b.files);
         }
@@ -271,10 +325,15 @@ function register(app, deps) {
       }
 
       console.log(`[${sid}] screening-request complete: ${results.map(r => `${r.building}→${r.action}`).join(', ')}`);
-      res.json({ success: true, submissionId: sid, records: results });
+      res.json({ success: true, submissionId: sid, records: results, ...(BC.enabled ? { billSets: true, reused: !!reuseUp } : {}) });
     } catch (err) {
       const msg = String(err && err.message || err);
       console.error(`[${sid}] /screening-request error:`, msg);
+      if (BC.enabled && /INVALID_(FIELD|TYPE)|No such column|sObject type/.test(msg)
+          && /Bill_Upload__c|Screening_Bill_|Solar_Bill_Upload__c|Screening_Requested_By__c/.test(msg)) {
+        return res.status(503).json({ success: false,
+          error: 'Bill sets are not yet available in Salesforce (CR-S4 pending).' });
+      }
       if (/INVALID_FIELD|No such column/.test(msg)) {
         return res.status(503).json({ success: false,
           error: 'Screening fields are not yet available in Salesforce (CR-S2 pending).' });
@@ -301,7 +360,9 @@ function register(app, deps) {
     if (data.length > MAX_SEPARATE_B64) return res.status(413).json({ success: false, error: `${name} is larger than 25 MB.` });
     try {
       const { access_token, instance_url } = await deps.getSFToken();
-      await deps.uploadOneFileToSF(instance_url, access_token, auth.buildingId, { name, data });
+      // 8.2.0: a file is also linked to its Bill_Upload__c (when the request created one), so a set is exactly its files.
+      const buId = BC.enabled ? await bills.findUploadId(deps, auth.buildingId, auth.sid, nowMs()) : null;
+      await deps.uploadOneFileToSF(instance_url, access_token, auth.buildingId, { name, data }, buId ? [buId] : []);
       console.log(`[${auth.sid}] screening-file ${name} → ${auth.buildingId}`);
       res.json({ success: true, name });
     } catch (err) {
@@ -316,18 +377,30 @@ function register(app, deps) {
     const auth = authUpload(body);
     if (!auth) return res.status(403).json({ success: false, error: 'This upload link has expired or is not valid. Please submit the form again.' });
     const failed = (Array.isArray(body.failed) ? body.failed : []).map(x => str(x, 200)).filter(Boolean);
+    // 8.2.0: a Solar-only upload also completes (the bill set is finalized) but must not request a Desk Audit.
+    const wantDesk = BC.enabled ? body.want_desk !== false : true;
+    const wantSolar = BC.enabled && body.want_solar === true;
     try {
       const { access_token, instance_url } = await deps.getSFToken();
-      const fields = { Screening_Status__c: 'Requested' };
+      const fields = wantDesk ? { Screening_Status__c: 'Requested' } : {};
+      let billUpload = null;
+      if (BC.enabled) {
+        const buId = await bills.findUploadId(deps, auth.buildingId, auth.sid, nowMs());
+        if (buId) {
+          billUpload = await bills.finalizeUpload(deps, buId, failed.length);
+          if (wantDesk) { fields.Screening_Bill_Upload__c = buId; fields.Screening_Bill_Source__c = 'New upload'; }
+          if (wantSolar) fields.Solar_Bill_Upload__c = buId;
+        }
+      }
       if (failed.length) {
         const cur = await deps.sfGetFields(instance_url, access_token, 'Buildings__c', auth.buildingId, ['Screening_Intake_Flags__c']);
         const flags = String(cur && cur.Screening_Intake_Flags__c || '').split(';').filter(Boolean);
         if (!flags.includes('bills_upload_incomplete')) flags.push('bills_upload_incomplete');
         fields.Screening_Intake_Flags__c = flags.join(';');
       }
-      await deps.sfPatch(instance_url, access_token, 'Buildings__c', auth.buildingId, fields);
+      if (Object.keys(fields).length) await deps.sfPatch(instance_url, access_token, 'Buildings__c', auth.buildingId, fields);
       console.log(`[${auth.sid}] screening-complete ${auth.buildingId}${failed.length ? ` (${failed.length} bill(s) failed)` : ''}`);
-      res.json({ success: true, failed: failed.length });
+      res.json({ success: true, failed: failed.length, ...(billUpload ? { billUpload: { status: billUpload.status, count: billUpload.count } } : {}) });
     } catch (err) {
       const msg = String(err && err.message || err);
       console.error(`[${auth.sid}] /screening-complete error:`, msg);
