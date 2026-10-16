@@ -314,7 +314,7 @@ function register(app, deps) {
           rec.maxFileBytes = MAX_SEPARATE_BYTES;
           if (BC.enabled) {
             rec.billUploadId = await bills.createUpload(deps, BC, { buildingId, sid, nowIso, contactId,
-              email: v.contact.email, name: `${v.contact.first_name} ${v.contact.last_name}`.trim(),
+              email: v.contact.email,
               purposes: [want.desk && 'Desk Audit', want.solar && 'Solar Assessment'].filter(Boolean),
               consentVersion: String((req.body && req.body.consent_version) || '').slice(0, 40) });
           }

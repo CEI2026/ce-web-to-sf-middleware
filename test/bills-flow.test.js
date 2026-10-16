@@ -11,10 +11,10 @@ const NOW = Date.parse('2026-10-15T12:00:00Z');
 
 function world({ contactEmail = 'office@parish.org', uploads, mailFails = false } = {}) {
   const ups = uploads || [
-    { Id: BU1, Name: 'BU-000001', Submission_ID__c: 'ES-20260601-AAAAAA', Uploader_Email__c: 'uploader@parish.org', Uploader_Name__c: 'Fred F',
+    { Id: BU1, Name: 'BU-000001', Submission_ID__c: 'ES-20260601-AAAAAA', Uploader_Email__c: 'uploader@parish.org',
       Uploaded_At__c: '2026-06-01T10:00:00Z', Bill_Count__c: 3, Bill_Filenames__c: 'jan.pdf\nfeb.pdf\nmar.pdf', Purpose__c: 'Desk Audit',
       Reuse_Expires_On__c: '2027-07-01', Reuse_Count__c: 0, Status__c: 'Complete' },
-    { Id: BU2, Name: 'BU-000002', Submission_ID__c: 'ES-20250101-BBBBBB', Uploader_Email__c: 'uploader@parish.org', Uploader_Name__c: 'Fred F',
+    { Id: BU2, Name: 'BU-000002', Submission_ID__c: 'ES-20250101-BBBBBB', Uploader_Email__c: 'uploader@parish.org',
       Uploaded_At__c: '2025-01-01T10:00:00Z', Bill_Count__c: 2, Bill_Filenames__c: 'old.pdf', Purpose__c: 'Desk Audit',
       Reuse_Expires_On__c: '2026-02-01', Reuse_Count__c: 0, Status__c: 'Complete' },       // expired
   ];
@@ -206,7 +206,7 @@ test('new upload: a Bill_Upload is created, each file is linked to it, complete 
     const rec = r.body.records[0];
     assert.ok(rec.uploadToken);
     const bu = t.state.posts.find(p => p.obj === 'Bill_Upload__c').data;
-    assert.strictEqual(bu.Status__c, 'Uploading'); assert.strictEqual(bu.Uploader_Email__c, 'uploader@parish.org');
+    assert.strictEqual(bu.Status__c, 'Uploading'); assert.strictEqual(bu.Uploader_Email__c, 'uploader@parish.org'); assert.ok(!('Uploader_Name__c' in bu), 'the name field was removed from Bill_Upload__c in Salesforce');
     assert.strictEqual(bu.Reuse_Expires_On__c, '2027-11-14', '395 days after 2026-10-15');
     const pre = t.state.patches.find(p => p.obj === 'Buildings__c').data;
     assert.ok(pre.Screening_Status__c == null, 'not fetchable until complete');
