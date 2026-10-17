@@ -227,6 +227,52 @@ test('new upload: a Bill_Upload is created, each file is linked to it, complete 
   } finally { t.close(); }
 });
 
+const KEY = 'ea-2026-10-16';
+const submitWith = (t, extra) => post(t.base, '/screening-request', reqBody({ upload_mode: 'separate', want: { desk: true, solar: true }, ...extra },
+  { bill_files: [{ name: 'a.pdf', size: 10 }] }));
+const buPost = t => t.state.posts.find(p => p.obj === 'Bill_Upload__c').data;
+
+test('consent: the stored wording comes from the server\'s table for the key the page sends', async () => {
+  const t = await boot();
+  try {
+    assert.strictEqual((await submitWith(t, { consent_version: KEY })).status, 200);
+    const bu = buPost(t);
+    assert.strictEqual(bu.Consent_Text_Version__c, KEY);
+    assert.strictEqual(bu.Consent_Text__c, require('../lib/bills').CONSENT_TEXTS[KEY]);
+    assert.match(bu.Consent_Text__c, /^I agree that Catholic Energies may store these bills and figures/);
+  } finally { t.close(); }
+});
+
+test('consent: words sent by the browser are never stored; an unknown key or none records no wording but the submission is kept', async () => {
+  let t = await boot();
+  try {
+    assert.strictEqual((await submitWith(t, { consent_version: 'x-made-up', consent_text: 'I agree to anything' })).status, 200);
+    const bu = buPost(t);
+    assert.ok(!('Consent_Text__c' in bu) && !('Consent_Text_Version__c' in bu));
+  } finally { t.close(); }
+  t = await boot();
+  try {
+    assert.strictEqual((await submitWith(t, {})).status, 200);
+    assert.ok(!('Consent_Text__c' in buPost(t)));
+  } finally { t.close(); }
+});
+
+test('consent: until Consent_Text__c exists in Salesforce the upload is still saved, with the version label', async () => {
+  const w = world(); const real = w.sf.sfPost;
+  w.sf.sfPost = async (i, t, obj, data) => {
+    if (obj === 'Bill_Upload__c' && 'Consent_Text__c' in data) throw new Error('SF POST Bill_Upload__c failed: [{"errorCode":"INVALID_FIELD","message":"No such column \'Consent_Text__c\' on sobject of type Bill_Upload__c"}]');
+    return real(i, t, obj, data);
+  };
+  const t = await boot({}, w);
+  try {
+    const r = await submitWith(t, { consent_version: KEY });
+    assert.strictEqual(r.status, 200, JSON.stringify(r.body));
+    const bu = buPost(t);
+    assert.strictEqual(bu.Consent_Text_Version__c, KEY);
+    assert.ok(!('Consent_Text__c' in bu));
+  } finally { t.close(); }
+});
+
 test('new upload: a failed file leaves the set Incomplete (never offered for reuse)', async () => {
   const t = await boot();
   try {

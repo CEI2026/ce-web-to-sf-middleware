@@ -24,7 +24,7 @@ const { getLimits, createRouteLimits } = require('./lib/limits');
 const billsLib = require('./lib/bills');
 const { createMailer } = require('./lib/mailer');
 
-const VERSION = '8.2.1';
+const VERSION = '8.2.2';
 
 function createApp(opts = {}) {
   const env = opts.env || process.env;
